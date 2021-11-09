@@ -14,7 +14,7 @@ This information is used to build model architecture (for inputs and outputs). A
 - train_path=None - path to train.csv file. This should be csv file with two columns - first for absolute paths to images, second for label.  Examples can be found in `models/data/train.csv`.
 - test_path=None - path to train.csv file. Same as train.csv but for test dataset. Examples can be found in `models/data/test.csv`.
 
-        please note that, when training,    train data will be split into train and valid, where 
+        please note that, when training, train data will be split into train and valid, where 
         validation dataset size will be the same as test. validation will be used for 
         evaluating model at every epoch and test set will be used for evaluating final model.
 
