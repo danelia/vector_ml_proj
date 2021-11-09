@@ -1,8 +1,8 @@
 # vector_ml_proj
 ### Part 1
 
-First of all, we will gather all the dasatet from Keras. It will need a little bit of pre-processing. 
-Images are given as (28, 28) matrix, we will need to reshape them to (28, 28, 1), since it's greyscale image channel will be 1. Also, each pixel value is in range (0, 255), so we will divide them by 255 so that they are in (0, 1) range. We have test set of size 10K, but we will still split training set to have the same size (10K) validation set. And finally, for labels, we will use keras `to_categorical` function to generate "dymmies".
+First of all, we will gather all the dataset from Keras. It will need a little bit of pre-processing. 
+Images are given as (28, 28) matrix, we will need to reshape them to (28, 28, 1), since it's greyscale image channel will be 1. Also, each pixel value is in range (0, 255), so we will divide them by 255 so that they are in (0, 1) range. We have test set of size 10K, but we will still split training set to have the same size (10K) validation set. And finally, for labels, we will use keras `to_categorical` function to generate "dummies".
 Network will have two Conv layers with AveragePooling, two dense layers and output layer. This model did quite well with loss and accuracy of `[0.3641086518764496, 0.909500002861023]` on test set. But, during training, while training loss was going down I noticed validation loss was increasing. This means there is a chance of model overfitting. To try to improve this let's add dropout layers. After doing this, we can see that, now both validation and training loss are decreasing and we have final score of `[0.2450890690088272, 0.9122999906539917]` on test set. It did improve a little bit! We will save this model in `models/saved` directory, for future use.
 
 Everything described above can be found in `notebooks/cnn.ipynb`.
@@ -40,21 +40,23 @@ Future improvements:
 For this part we will write factory class. It is located in `PubSub/PubSub.py`. The idea is to give the factory class vendor and configuration dict. And from there, user will be able to create as many producers and consumers as they want, using that vendor and that config. Implemented vendors for now are `['gcp', 'kafka']` for Google Pub/Sub or Apache kafka. Configurations can be found in `cfg.py`. Usually, it's not good idea to have configs in .py file, but it's easier for our demonstration.
 
 Configs are as follows:
-`kafka`
 
+`kafka`
+`````json
     {
         "kafka_servers": [
             "localhost:9092"
             ]
     }
-    
-`Google Pub/Sub`
+`````
 
+`Google Pub/Sub`
+`````json
     {
         "project_id" : "",
     
         "credentials" : {
-            "type": ",
+            "type": "",
             "project_id": "",
             "private_key_id": "",
             "private_key": "",
@@ -66,6 +68,7 @@ Configs are as follows:
             "client_x509_cert_url": ""
         }
     }
+`````
 
 After creating PubSub object, it has two methods: `create_producer(topic_id)` and `create_consumer(topic_subscription_id, callback)`. 
 
@@ -74,7 +77,7 @@ In `create_producer(topic_id)` topic_id identifies on what topic messages should
 In case of `create_consumer(topic_subscription_id, callback)` we can be waiting for topic_id in case kafka is used, or subscription_id if google pub/sub if used. Hence, the name. Also, user has to write callback function, that will be passed to this function. Arguments of this callback funtion are (key, value). So, after create_consumer is called, it will start new thread in the background, that will be waiting on any messages on that topic/subscription and will call callback function when it recieves any message.
 
 Usage:
-```` 
+`````python
 from PubSub.PubSub import PubSub
 from cfg import kafka_cfg
 import json
@@ -93,9 +96,6 @@ pubsub.create_consumer("app", callback)
 # returns Producer object, that has method .push to push messages to topic app
 producer = pubsub.create_producer("app")
 
-# to make sure consumer thread started
-sleep(.3)
-
 for i in range(5):
     message = {'data': str(i)}
 
@@ -103,8 +103,29 @@ for i in range(5):
 `````
 
 Only thing that will change in case we want to use Google pub/sub, apart from topic/subscription names is :
-```` 
+`````python
 pubsub = PubSub('gcp', gcp_cfg)
 `````
 
 Client classes, which PubSub is using to create producers and consumers are located in `PubSub/clients.py`. In future, to add more vendors, their client classes should be added here.
+
+### Part 3
+
+In this part, we will try to simulate the real world. We will achieve this by having `app.py` for sending requests asynchronously and `predictor.py` for receiving and processing those requests. The response will be simple classification result that our model from Part 1 will predict; and it will be sent back to `app.py`.
+
+For this we will have two topics, one for asking model for classification called app and second for model results called model_result. Consumer that will listen to model_result, can be imagined as database worker. We will mock db operations by printing out response. Our factory model `PubSub` helps a lot!
+
+To run it, first please create virtual env by:
+    
+    python3 -m venv /path/to/env
+    source /path/to/env/bin/activate
+    pip install -r requirements.py
+    
+And then in two different consoles, first run predictor:
+    
+    python predictor.py
+
+And finally:
+
+    python app.py
+    
