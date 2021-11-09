@@ -1,1 +1,4 @@
-env
+env3.8
+__pycache__
+*/__pycache__
+.DS_Store
