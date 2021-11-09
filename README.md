@@ -24,9 +24,13 @@ This information is used to build model architecture (for inputs and outputs). A
 
 Everything above can also be done from console:
 
-    python models/cnn_model.py fashion
-        or
-    python models/cnn_model.py train --img_width 255 --img_height 255 --channels 3 --num_classes 10 --train_path path/to/train.csv --test_path path/to/test.csv --batch_size 64 --epochs 20 --out_path path/to/save/model
+```bash
+python models/cnn_model.py fashion
+    or
+python models/cnn_model.py train --img_width 255 --img_height 255 --channels 3 \
+            --num_classes 10 --train_path path/to/train.csv --test_path path/to/test.csv \ 
+            --batch_size 64 --epochs 20 --out_path path/to/save/model
+```
 
 If fashion is used, than --img_width, --img_height and --channels parameters will be ignored and (28, 28, 1) will be used.
 
@@ -42,16 +46,16 @@ For this part we will write factory class. It is located in `PubSub/PubSub.py`. 
 Configs are as follows:
 
 `kafka`
-`````json
-    {
-        "kafka_servers": [
-            "localhost:9092"
-            ]
-    }
-`````
+```json
+{
+    "kafka_servers": [
+        "localhost:9092"
+        ]
+}
+```
 
 `Google Pub/Sub`
-`````json
+```json
     {
         "project_id" : "",
     
@@ -68,7 +72,7 @@ Configs are as follows:
             "client_x509_cert_url": ""
         }
     }
-`````
+```
 
 After creating PubSub object, it has two methods: `create_producer(topic_id)` and `create_consumer(topic_subscription_id, callback)`. 
 
@@ -77,7 +81,7 @@ In `create_producer(topic_id)` topic_id identifies on what topic messages should
 In case of `create_consumer(topic_subscription_id, callback)` we can be waiting for topic_id in case kafka is used, or subscription_id if google pub/sub if used. Hence, the name. Also, user has to write callback function, that will be passed to this function. Arguments of this callback funtion are (key, value). So, after create_consumer is called, it will start new thread in the background, that will be waiting on any messages on that topic/subscription and will call callback function when it recieves any message.
 
 Usage:
-`````python
+```python
 from PubSub.PubSub import PubSub
 from cfg import kafka_cfg
 import json
@@ -100,12 +104,12 @@ for i in range(5):
     message = {'data': str(i)}
 
     producer.push(value=json.dumps(message).encode('utf-8'), key=None)
-`````
+```
 
 Only thing that will change in case we want to use Google pub/sub, apart from topic/subscription names is :
-`````python
+```python
 pubsub = PubSub('gcp', gcp_cfg)
-`````
+```
 
 Client classes, which PubSub is using to create producers and consumers are located in `PubSub/clients.py`. In future, to add more vendors, their client classes should be added here.
 
@@ -116,16 +120,18 @@ In this part, we will try to simulate the real world. We will achieve this by ha
 For this we will have two topics, one for asking model for classification called app and second for model results called model_result. Consumer that will listen to model_result, can be imagined as database worker. We will mock db operations by printing out response. Our factory model `PubSub` helps a lot!
 
 To run it, first please create virtual env by:
-    
+
+```bash
     python3 -m venv /path/to/env
     source /path/to/env/bin/activate
     pip install -r requirements.py
+```
     
 And then in two different consoles, first run predictor:
     
     python predictor.py
 
 And finally:
-
-    python app.py
-    
+```bash
+python app.py
+```
