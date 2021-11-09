@@ -106,9 +106,13 @@ for i in range(5):
     producer.push(value=json.dumps(message).encode('utf-8'), key=None)
 ```
 
-Only thing that will change in case we want to use Google pub/sub, apart from topic/subscription names is :
+Only thing that will change in case we want to use Google pub/sub is :
 ```python
 pubsub = PubSub('gcp', gcp_cfg)
+
+pubsub.create_consumer("app-sub", callback)
+
+producer = pubsub.create_producer("app")
 ```
 
 Client classes, which PubSub is using to create producers and consumers are located in `PubSub/clients.py`. In future, to add more vendors, their client classes should be added here.
