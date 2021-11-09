@@ -119,19 +119,20 @@ In this part, we will try to simulate the real world. We will achieve this by ha
 
 For this we will have two topics, one for asking model for classification called app and second for model results called model_result. Consumer that will listen to model_result, can be imagined as database worker. We will mock db operations by printing out response. Our factory model `PubSub` helps a lot!
 
-To run it, first please create virtual env by:
+To run it, first please create virtual env and install requirements:
 
 ```bash
-    python3 -m venv /path/to/env
-    source /path/to/env/bin/activate
-    pip install -r requirements.py
+python3 -m venv /path/to/env
+source /path/to/env/bin/activate
+pip install -r requirements.py
 ```
     
-And then in two different consoles, first run predictor:
-    
-    python predictor.py
+And then run predictor:
+```bash    
+python predictor.py
+```
 
-And finally:
+And finally, in different console:
 ```bash
 python app.py
 ```
