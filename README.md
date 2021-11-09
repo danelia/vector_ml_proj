@@ -56,22 +56,22 @@ Configs are as follows:
 
 `Google Pub/Sub`
 ```json
-    {
-        "project_id" : "",
-    
-        "credentials" : {
-            "type": "",
-            "project_id": "",
-            "private_key_id": "",
-            "private_key": "",
-            "client_email": "",
-            "client_id": "",
-            "auth_uri": "",
-            "token_uri": "",
-            "auth_provider_x509_cert_url": "",
-            "client_x509_cert_url": ""
-        }
+{
+    "project_id" : "",
+
+    "credentials" : {
+        "type": "",
+        "project_id": "",
+        "private_key_id": "",
+        "private_key": "",
+        "client_email": "",
+        "client_id": "",
+        "auth_uri": "",
+        "token_uri": "",
+        "auth_provider_x509_cert_url": "",
+        "client_x509_cert_url": ""
     }
+}
 ```
 
 After creating PubSub object, it has two methods: `create_producer(topic_id)` and `create_consumer(topic_subscription_id, callback)`. 
